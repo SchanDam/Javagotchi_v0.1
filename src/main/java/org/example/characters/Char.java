@@ -12,6 +12,7 @@ public abstract class Char {
     protected int maxHp;
     protected String name;
     protected boolean miss;
+    protected boolean alive = true;
 
     protected Sounds output = new Sounds();
 
@@ -74,7 +75,11 @@ public abstract class Char {
         return false;
     }
 
-    public void escapeFight() throws InterruptedException {
+    public boolean isAlive() {
+        return alive;
+    }
+    public void setAlive(boolean alive) {
+        this.alive = alive;
     }
 
     public void getHitSound() {
@@ -82,8 +87,12 @@ public abstract class Char {
     }
     public void getCritSound() {
         output.playSound(SoundFiles.NORMALCRIT.getFileName());
+        System.out.println("*kritischer Treffer!*");
     }
     public void getMissSound() {
         output.playSound(SoundFiles.ATTACKMISS.getFileName());
+    }
+
+    public void escapeFight() throws InterruptedException {
     }
 }

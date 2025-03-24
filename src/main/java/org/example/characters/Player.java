@@ -1,4 +1,6 @@
 package org.example.characters;
+import org.example.Combatsys;
+import org.example.Utils;
 import org.example.audio.SoundFiles;
 import org.example.audio.Sounds;
 import java.util.Random;
@@ -26,7 +28,7 @@ public class Player extends Char {
     }
     @Override public void getCritSound() {
         output.playSound(SoundFiles.CLOUDCRIT.getFileName());
-
+        System.out.println("*kritischer Treffer!*");
     }
     @Override public void getMissSound() {
         output.playSound(SoundFiles.ATTACKMISS.getFileName());
@@ -75,18 +77,17 @@ public class Player extends Char {
         return escape;
     }
 
-    @Override public void escapeFight() throws InterruptedException {
+    @Override public void escapeFight() {
         boolean escapeChance = (rng.nextInt(100) < 80);
-
 
         if (escapeChance == true) {
             System.out.println("Du bist geflüchtet");
             output.playSound(SoundFiles.ESCAPE.getFileName());
             escape = true;
-            Game.running = false;
+            Combatsys.running = false;
         } else {
             System.out.println("Du konntest nicht flüchten");
-            Thread.sleep(200);
+            Utils.sleep(200);
             output.playSound("sounds/inputFail.wav");
             escape = false;
         }

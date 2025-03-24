@@ -6,7 +6,7 @@ import java.io.InputStream;
 
 public class Sounds {
 
-    private float volume = -10.0f; // Standard-Lautstärke in dB
+    private float volume = -1.0f; // Standard-Lautstärke in dB
 
     public void setVolume(float volume) {
         this.volume = volume;

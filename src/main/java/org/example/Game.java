@@ -16,7 +16,6 @@ public class Game {
 
     static Player player = new Player();
     static Enemies enemy;
-    Combatsys comsys = new Combatsys(player, enemy);
 
     // Einleitung
     public static void introduce() throws InterruptedException {
@@ -185,7 +184,7 @@ public class Game {
         System.out.println("\"3\" für Drache");
         //Utils.sleep(300);
         System.out.printf("\"q\" zurück in Hauptmenü%n");
-        input = sc.nextLine();
+        input = Utils.getSoundInput();
 
         switch (input) {
             case "1" -> {
@@ -199,7 +198,8 @@ public class Game {
                 System.out.printf("%nKampf beginnt gegen %s\n", enemy.getName());
                 output.playSound(SoundFiles.STARTFIGHT.getFileName());
                 Utils.sleep(500);
-                Combatsys.startFight();
+                Combatsys comsys = new Combatsys(player, enemy);
+                comsys.fight();
 
             }
             case "2" -> enemy = new Oger();
