@@ -76,7 +76,7 @@ public abstract class Char {
     }
 
     public boolean isAlive() {
-        return alive;
+        return getHp() > 0;
     }
     public void setAlive(boolean alive) {
         this.alive = alive;

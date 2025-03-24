@@ -26,24 +26,23 @@ public class Combatsys {
     // Kampflogik
     public void fight() throws InterruptedException {
         running = true;
-        while (attacker.getHp() > 1 && target.getHp() > 1 && running == true) {
+        while (attacker.isAlive() == true && target.isAlive() == true && running == true) {
 
-            // Angriff Spieler ⇒ Gegner
-            if (attacker.isBlock() == false) {
-                if (attacker.isMiss() == true) {
-                    System.out.printf("%nDer Angriff ging daneben.%n");
-                    output.playSound(SoundFiles.ATTACKMISS.getFileName());
-                } else {
-                    attack();
-                    System.out.printf("%n%s greift %s an und verursacht %s Schaden. ", attacker.getName(), target.getName(), finalDamage);
-                    Utils.sleep(100);
-                    System.out.printf("%s%n", showCritAndHitSound(attacker));
-                    Utils.sleep(500);
-                    System.out.printf("Verbleibende Lebenspunkte von %s: %s%n", target.getName(), target.getHp());
-                    Utils.sleep(1500);
-                }
+            playerTurn();
+            swapRoles();
+            enemyTurn();
+            swapRoles();
+            nextRoundOption();
+
+            // Spieler besiegt
+            if (target.isAlive() == false) {
+                System.out.printf("%n%s wurde besiegt!%n", target.getName());
+                Thread.sleep(500);
+                System.out.println("Dein Sättigungslevel ist um 3 gesunken."); // TODO soll in Zukunft random sein
+                target.setHunger(target.getHunger() - 3);
             }
-            if (target.getHp() < 1) {
+
+            if (target.isAlive() == false) {
                 System.out.printf("%n%s wurde besiegt!%n%n", target.getName());
                 output.playSound(SoundFiles.ENEMYDEADSHORT.getFileName());
                 Thread.sleep(200);
@@ -52,33 +51,17 @@ public class Combatsys {
                 Game.player.setGold(Game.player.getGold() + 10);
                 Game.player.setPunkte(Game.player.getPunkte() + 100);
             }
-            swapRoles();
-            if (attacker.isMiss() == true) {
-                System.out.printf("%nDer Angriff ging daneben.%n");
-                output.playSound(SoundFiles.ATTACKMISS.getFileName());
-                swapRoles();
-            } else {
-                attack();
-                System.out.printf("%n%s greift %s an und verursacht %s Schaden. ", attacker.getName(), target.getName(), finalDamage);
-                Utils.sleep(100);
-                System.out.printf("%s%n", showCritAndHitSound(attacker));
-                Utils.sleep(500);
-                System.out.printf("Verbleibende Lebenspunkte von %s: %s%n", target.getName(), target.getHp());
-                Utils.sleep(1500);
-                swapRoles();
-            }
-            nextRoundOption();
         }
     }
 
     // Schadensberechnung
-    public int calcDamage() throws InterruptedException {
+    private int calcDamage() throws InterruptedException {
         if (attacker.isEscape() == true) {
             attacker.escapeFight();
             return 0;
         }
         int baseDamage = Math.max(0, attacker.getStr() - target.getDef());
-        attacker.setMiss() = (rng.nextInt(100) < 10);
+        attacker.setMiss(rng.nextInt(100) < 10);
         isCritical = (rng.nextInt(100) < 15);
         finalDamage = isCritical ? baseDamage * 2 : baseDamage;
 
@@ -90,14 +73,49 @@ public class Combatsys {
     }
 
     // Schaden ausführen
-    public void attack() throws InterruptedException {
+    private void attack() throws InterruptedException {
         if (running == false || attacker.isEscape() == true) return;
         finalDamage = calcDamage();
         target.setHp(target.getHp() - finalDamage);
     }
 
+    // Angriff Spieler ⇒ Gegner
+    private void playerTurn() throws InterruptedException {
+
+        if (attacker.isMiss() == true) {
+            System.out.printf("%nDer Angriff ging daneben.%n");
+            output.playSound(SoundFiles.ATTACKMISS.getFileName());
+        } else {
+            attack();
+            System.out.printf("%n%s greift %s an und verursacht %s Schaden. ", attacker.getName(), target.getName(), finalDamage);
+            Utils.sleep(100);
+            System.out.printf("%s%n", showCritAndHitSound(attacker));
+            Utils.sleep(500);
+            System.out.printf("Verbleibende Lebenspunkte von %s: %s%n", target.getName(), target.getHp());
+            Utils.sleep(1500);
+        }
+
+    }
+
+    // Angriff Gegner ⇒ Spieler
+    private void enemyTurn() throws InterruptedException {
+        if (attacker.isMiss() == true) {
+            System.out.printf("%nDer Angriff ging daneben.%n");
+            output.playSound(SoundFiles.ATTACKMISS.getFileName());
+            swapRoles();
+        } else {
+            attack();
+            System.out.printf("%n%s greift %s an und verursacht %s Schaden. ", attacker.getName(), target.getName(), finalDamage);
+            Utils.sleep(100);
+            System.out.printf("%s%n", showCritAndHitSound(attacker));
+            Utils.sleep(500);
+            System.out.printf("Verbleibende Lebenspunkte von %s: %s%n", target.getName(), target.getHp());
+            Utils.sleep(1500);
+        }
+    }
+
     // Auswahl nächste Runde
-    public void nextRoundOption() throws InterruptedException {
+    private void nextRoundOption() throws InterruptedException {
 
         if (attacker.getHp() > 1) {
             System.out.printf("%n**Nächste Runde**%n%n");
@@ -113,11 +131,7 @@ public class Combatsys {
             switch (input) {
                 case "1" -> swapRoles();
                 case "2" -> attacker.setBlock(true);
-                case "3" -> {
-                    attacker.escapeFight();
-                    if (running == false) {
-                    }
-                }
+                case "3" -> attacker.escapeFight();
             }
         }
     }
