@@ -13,14 +13,16 @@ public class Combatsys {
 
     private Char attacker;
     private Char target;
+    private final Char truePlayer;
 
-    public Combatsys(Char attacker, Char target) {
+    public Combatsys(Char attacker, Char target, Char truePlayer) {
         this.attacker = attacker;
         this.target = target;
+        this.truePlayer = truePlayer;
     }
 
     int finalDamage;
-    static boolean isCritical;
+    boolean isCritical;
     public static boolean running = true;
 
     // Kampflogik
@@ -29,27 +31,21 @@ public class Combatsys {
         while (attacker.isAlive() == true && target.isAlive() == true && running == true) {
 
             playerTurn();
+            checkDefeat();
             swapRoles();
             enemyTurn();
+            checkDefeat();
             swapRoles();
             nextRoundOption();
 
             // Spieler besiegt
-            if (target.isAlive() == false) {
-                System.out.printf("%n%s wurde besiegt!%n", target.getName());
-                Thread.sleep(500);
-                System.out.println("Dein Sättigungslevel ist um 3 gesunken."); // TODO soll in Zukunft random sein
-                target.setHunger(target.getHunger() - 3);
+            if (truePlayer.isAlive() == false) {
+                Game.playerDefeat();
             }
 
+            // Gegner besiegt
             if (target.isAlive() == false) {
-                System.out.printf("%n%s wurde besiegt!%n%n", target.getName());
-                output.playSound(SoundFiles.ENEMYDEADSHORT.getFileName());
-                Thread.sleep(200);
-                output.playSoundAsync(SoundFiles.GETCOIN.getFileName());
-                System.out.println("Du hast 10 Gold und 100 Punkte erhalten!");
-                Game.player.setGold(Game.player.getGold() + 10);
-                Game.player.setPunkte(Game.player.getPunkte() + 100);
+                Game.enemyDefeat();
             }
         }
     }
@@ -133,6 +129,18 @@ public class Combatsys {
                 case "2" -> attacker.setBlock(true);
                 case "3" -> attacker.escapeFight();
             }
+        }
+    }
+
+    // defeatcheck
+    private void checkDefeat() throws InterruptedException {
+        if (target == truePlayer && target.isAlive() == false) {
+           Game.playerDefeat();
+           running = false;
+        }
+        else {
+            Game.enemyDefeat();
+            running = false;
         }
     }
 

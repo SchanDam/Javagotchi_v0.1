@@ -13,6 +13,7 @@ public class Game {
     static Random rng = new Random();
     static Sounds output = new Sounds();
     static String input;
+    static int hungerDecrease;
 
     static Player player = new Player();
     static Enemies enemy;
@@ -153,7 +154,7 @@ public class Game {
         int strIncrease = rng.nextInt(1, 5);         // 1 bis 4
         int defIncrease = rng.nextInt(1, 4);         // 1 bis 3
         int hpIncrease = rng.nextInt(15, 26);        // 15 bis 25
-        int hungerDecrease = rng.nextInt(-4, 0);     // -1 bis -4
+        hungerDecrease = rng.nextInt(-4, 0);     // -1 bis -4
 
         player.setStr(player.getStr() + strIncrease);
         player.setDef(player.getDef() + defIncrease);
@@ -198,9 +199,8 @@ public class Game {
                 System.out.printf("%nKampf beginnt gegen %s\n", enemy.getName());
                 output.playSound(SoundFiles.STARTFIGHT.getFileName());
                 Utils.sleep(500);
-                Combatsys comsys = new Combatsys(player, enemy);
-                comsys.fight();
-
+                Combatsys comSys = new Combatsys(player, enemy, player);
+                comSys.fight();
             }
             case "2" -> enemy = new Oger();
             case "3" -> enemy = new Drache();
@@ -370,5 +370,24 @@ public class Game {
             }
         }
     }
+
+    public static void playerDefeat() {
+        hungerDecrease = rng.nextInt(-5,-1);
+        player.setHunger(player.getHunger() + hungerDecrease);
+        System.out.printf("%n%s wurde besiegt!%n", player.getName());
+        Utils.sleep(500);
+        System.out.printf("%nDein Sättigungslevel ist um %d gesunken.", hungerDecrease);
+    }
+
+    public static void enemyDefeat() throws InterruptedException {
+        System.out.printf("%n%s wurde besiegt!%n%n", enemy.getName());
+        output.playSound(SoundFiles.ENEMYDEADSHORT.getFileName());
+        Thread.sleep(200);
+        output.playSoundAsync(SoundFiles.GETCOIN.getFileName());
+        System.out.println("Du hast 10 Gold und 100 Punkte erhalten!");
+        Game.player.setGold(Game.player.getGold() + 10);
+        Game.player.setPunkte(Game.player.getPunkte() + 100);
+    }
+
 
 }

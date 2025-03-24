@@ -22,7 +22,6 @@ public class Player extends Char {
         super("", 1, 1, 100);
     }
 
-
     @Override public void getHitSound() {
         output.playSound(SoundFiles.CLOUDHIT.getFileName());
     }
