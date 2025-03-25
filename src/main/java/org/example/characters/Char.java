@@ -1,6 +1,5 @@
 package org.example.characters;
 
-import org.example.Utils;
 import org.example.audio.SoundFiles;
 import org.example.audio.SoundEffects;
 

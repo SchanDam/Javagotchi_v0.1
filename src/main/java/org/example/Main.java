@@ -8,10 +8,10 @@ public class Main {
     static SoundEffects output = new SoundEffects();
 
     public static void main(String[] args) throws Exception {
-        Utils.skipDelays = false; //true ignoriert alle sleeps, false führt sie aus
+        Utils.skipDelays = true; //true ignoriert alle sleeps, false führt sie aus
         boolean running = true;
 
-        //Game.introduce();
+        Game.introduce();
 
         while (running) {
             System.out.printf("%n? für Menüanzeige%n");
@@ -111,4 +111,3 @@ public class Main {
         }
     }
 }
-
