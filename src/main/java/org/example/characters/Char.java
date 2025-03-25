@@ -2,7 +2,7 @@ package org.example.characters;
 
 import org.example.Utils;
 import org.example.audio.SoundFiles;
-import org.example.audio.Sounds;
+import org.example.audio.SoundEffects;
 
 public abstract class Char {
 
@@ -14,7 +14,7 @@ public abstract class Char {
     protected boolean miss;
     protected boolean alive = true;
 
-    protected Sounds output = new Sounds();
+    protected SoundEffects output = new SoundEffects();
 
     public Char(String name, int getStr, int getDef, int getHp) {
         this.str = getStr;
@@ -76,21 +76,18 @@ public abstract class Char {
     }
 
     public boolean isAlive() {
-        return alive;
-    }
-    public void setAlive(boolean alive) {
-        this.alive = alive;
+        return getHp() > 0;
     }
 
     public void getHitSound() {
-        output.playSound(SoundFiles.NORMALHIT.getFileName());
+        output.playSoundAsync(SoundFiles.NORMALHIT.getFileName());
     }
-    public void getCritSound() {
-        output.playSound(SoundFiles.NORMALCRIT.getFileName());
-        System.out.println("*kritischer Treffer!*");
+    public String getCritSound() {
+        output.playSoundAsync(SoundFiles.NORMALCRIT.getFileName());
+        return "*kritischer Treffer!*";
     }
     public void getMissSound() {
-        output.playSound(SoundFiles.ATTACKMISS.getFileName());
+        output.playSoundAsync(SoundFiles.ATTACKMISS.getFileName());
     }
 
     public void escapeFight() throws InterruptedException {

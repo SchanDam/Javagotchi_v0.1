@@ -1,108 +1,134 @@
 package org.example;
 
+import org.example.audio.SoundEffects;
 import org.example.audio.SoundFiles;
-import org.example.audio.Sounds;
 import org.example.characters.*;
 
 import java.util.Random;
 
 public class Combatsys {
-    static Sounds output = new Sounds();
-    static Random rng = new Random();
-    static String input;
+    SoundEffects output = new SoundEffects();
+    Random rng = new Random();
+
+    String input;
+    int finalDamage;
+    boolean isCritical;
+    public static boolean running = true;
 
     private Char attacker;
-    private Char target;
+    private Char defender;
+    private final Char truePlayer;
 
-    public Combatsys(Char attacker, Char target) {
+    public Combatsys(Char attacker, Char defender, Char truePlayer) {
         this.attacker = attacker;
-        this.target = target;
+        this.defender = defender;
+        this.truePlayer = truePlayer;
     }
-
-    int finalDamage;
-    static boolean isCritical;
-    public static boolean running = true;
 
     // Kampflogik
     public void fight() throws InterruptedException {
         running = true;
-        while (attacker.getHp() > 1 && target.getHp() > 1 && running == true) {
+        while (attacker.isAlive() == true && defender.isAlive() == true && running == true) {
 
-            // Angriff Spieler ⇒ Gegner
-            if (attacker.isBlock() == false) {
-                if (attacker.isMiss() == true) {
-                    System.out.printf("%nDer Angriff ging daneben.%n");
-                    output.playSound(SoundFiles.ATTACKMISS.getFileName());
-                } else {
-                    attack();
-                    System.out.printf("%n%s greift %s an und verursacht %s Schaden. ", attacker.getName(), target.getName(), finalDamage);
-                    Utils.sleep(100);
-                    System.out.printf("%s%n", showCritAndHitSound(attacker));
-                    Utils.sleep(500);
-                    System.out.printf("Verbleibende Lebenspunkte von %s: %s%n", target.getName(), target.getHp());
-                    Utils.sleep(1500);
-                }
-            }
-            if (target.getHp() < 1) {
-                System.out.printf("%n%s wurde besiegt!%n%n", target.getName());
-                output.playSound(SoundFiles.ENEMYDEADSHORT.getFileName());
-                Thread.sleep(200);
-                output.playSoundAsync(SoundFiles.GETCOIN.getFileName());
-                System.out.println("Du hast 10 Gold und 100 Punkte erhalten!");
-                Game.player.setGold(Game.player.getGold() + 10);
-                Game.player.setPunkte(Game.player.getPunkte() + 100);
-            }
+            playerTurn();
+            checkDefeat();
+            if (running == false) break;
             swapRoles();
-            if (attacker.isMiss() == true) {
-                System.out.printf("%nDer Angriff ging daneben.%n");
-                output.playSound(SoundFiles.ATTACKMISS.getFileName());
-                swapRoles();
-            } else {
-                attack();
-                System.out.printf("%n%s greift %s an und verursacht %s Schaden. ", attacker.getName(), target.getName(), finalDamage);
-                Utils.sleep(100);
-                System.out.printf("%s%n", showCritAndHitSound(attacker));
-                Utils.sleep(500);
-                System.out.printf("Verbleibende Lebenspunkte von %s: %s%n", target.getName(), target.getHp());
-                Utils.sleep(1500);
-                swapRoles();
-            }
+            enemyTurn();
+            checkDefeat();
+            if (running == false) break;
+            swapRoles();
             nextRoundOption();
         }
     }
 
     // Schadensberechnung
-    public int calcDamage() throws InterruptedException {
+    private int calcDamage() throws InterruptedException {
         if (attacker.isEscape() == true) {
             attacker.escapeFight();
             return 0;
         }
-        int baseDamage = Math.max(0, attacker.getStr() - target.getDef());
-        attacker.setMiss() = (rng.nextInt(100) < 10);
+        int baseDamage = Math.max(0, attacker.getStr() - defender.getDef());
         isCritical = (rng.nextInt(100) < 15);
         finalDamage = isCritical ? baseDamage * 2 : baseDamage;
 
-        if (target.isBlock() == true) {
+        if (defender.isBlock() == true) {
             finalDamage /= 2;
-            target.setBlock(false);
         }
         return finalDamage;
     }
 
     // Schaden ausführen
-    public void attack() throws InterruptedException {
+    private void attack() throws InterruptedException {
         if (running == false || attacker.isEscape() == true) return;
         finalDamage = calcDamage();
-        target.setHp(target.getHp() - finalDamage);
+        defender.setHp(defender.getHp() - finalDamage);
+    }
+
+    // Angriff Spieler ⇒ Gegner
+    private void playerTurn() throws InterruptedException {
+        attacker.setMiss(rng.nextInt(100) < 10);
+        if (attacker.isBlock() == true) {
+            System.out.printf("%n%s blockt!%n", attacker.getName());
+            Utils.sleep(500);
+            return;
+        }
+        if (attacker.isMiss() == true) {
+            isCritical = false;
+            System.out.printf("%nDer Angriff von %s ging daneben.%n", attacker.getName());
+            attacker.getMissSound();
+            Utils.sleep(1000);
+            attacker.setMiss(false);
+        } else {
+            attack();
+            System.out.printf("%n%s greift %s an und verursacht %s Schaden. ", attacker.getName(), defender.getName(), finalDamage);
+            Utils.sleep(50);
+            if (isCritical == true) {
+                System.out.print(attacker.getCritSound());
+            } else {
+                attacker.getHitSound();
+            }
+            Utils.sleep(500);
+            System.out.printf("%nVerbleibende Lebenspunkte von %s: %s%n", defender.getName(), defender.getHp());
+            Utils.sleep(1000);
+        }
+    }
+
+    // Angriff Gegner ⇒ Spieler
+    private void enemyTurn() throws InterruptedException {
+        attacker.setMiss(rng.nextInt(100) < 10);
+        if (attacker.isMiss() == true) {
+            isCritical = false;
+            System.out.printf("%nDer Angriff von %s ging daneben.%n", attacker.getName());
+            attacker.getMissSound();
+            Utils.sleep(1000);
+            attacker.setMiss(false);
+        } else {
+            attack();
+            if (defender.isBlock() == true) {
+                defender.setBlock(false);
+            }
+            System.out.printf("%n%s greift %s an und verursacht %s Schaden. ", attacker.getName(), defender.getName(), finalDamage);
+            Utils.sleep(50);
+            if (isCritical == true) {
+                System.out.print(attacker.getCritSound());
+            } else {
+                attacker.getHitSound();
+            }
+            Utils.sleep(500);
+            System.out.printf("%nVerbleibende Lebenspunkte von %s: %s%n", defender.getName(), defender.getHp());
+            Utils.sleep(1000);
+        }
     }
 
     // Auswahl nächste Runde
-    public void nextRoundOption() throws InterruptedException {
+    private void nextRoundOption() throws InterruptedException {
 
+        if (attacker != truePlayer) return;
         if (attacker.getHp() > 1) {
             System.out.printf("%n**Nächste Runde**%n%n");
             Utils.sleep(100);
-            output.playSound(SoundFiles.NEXTROUND.getFileName());
+            output.playSoundAsync(SoundFiles.NEXTROUND.getFileName());
             System.out.println("\"1\" für angreifen");
             System.out.println("\"2\" für blocken");
             System.out.println("\"3\" für flüchten");
@@ -111,38 +137,29 @@ public class Combatsys {
             Utils.sleep(500);
 
             switch (input) {
-                case "1" -> swapRoles();
-                case "2" -> attacker.setBlock(true);
-                case "3" -> {
-                    attacker.escapeFight();
-                    if (running == false) {
-                    }
+                case "1" -> {
                 }
+                case "2" -> truePlayer.setBlock(true);
+                case "3" -> attacker.escapeFight();
             }
         }
     }
 
-    //Methode zum Tausch der Kampfteilnehmer
-    private void swapRoles() {
-        Char temp = attacker;
-        attacker = target;
-        target = temp;
+    // defeatcheck
+    private void checkDefeat() throws InterruptedException {
+        if (defender == truePlayer && defender.isAlive() == false) {
+            Game.playerDefeat();
+            running = false;
+        } else if (defender != truePlayer && defender.isAlive() == false) {
+            Game.enemyDefeat();
+            running = false;
+        }
     }
 
-    public String showCritAndHitSound(Char attacker) {
-        if (attacker == Game.player && isCritical == true) {
-            output.playSound(SoundFiles.CLOUDCRIT.getFileName());
-            return "*kritischer Treffer!*";
-        } else if (attacker == Game.player) {
-            output.playSound("sounds/cloudHit.wav");
-            return "";
-        } else if (attacker == Game.enemy && isCritical == true) {
-            output.playSound("sounds/normalHit.wav");
-            return "*kritischer Treffer!*";
-        } else if (attacker == Game.enemy) {
-            output.playSound("sounds/normalHit.wav");
-            return "";
-        }
-        return "";
+    //Methode zum Tausch der Kampfteilnehmer (Hinweis von CHATGPT)
+    private void swapRoles() {
+        Char temp = attacker;
+        attacker = defender;
+        defender = temp;
     }
 }

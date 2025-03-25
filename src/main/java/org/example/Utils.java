@@ -1,12 +1,12 @@
 package org.example;
-import org.example.audio.Sounds;
+import org.example.audio.SoundEffects;
 import java.util.Random;
 import java.util.Scanner;
 
 public class Utils {
     private static final Random rng = new Random();
     private static final Scanner sc = new Scanner(System.in);
-    private static final Sounds output = new Sounds();
+    private static final SoundEffects output = new SoundEffects();
 
     public static void sout(String text) {
         try {

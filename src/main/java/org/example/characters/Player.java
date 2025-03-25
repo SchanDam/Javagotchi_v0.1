@@ -2,7 +2,7 @@ package org.example.characters;
 import org.example.Combatsys;
 import org.example.Utils;
 import org.example.audio.SoundFiles;
-import org.example.audio.Sounds;
+import org.example.audio.SoundEffects;
 import java.util.Random;
 import org.example.Game;
 
@@ -16,22 +16,21 @@ public class Player extends Char {
     private boolean escape = false;
 
     Random rng = new Random();
-    Sounds output = new Sounds();
+    SoundEffects output = new SoundEffects();
 
     public Player() {
         super("", 1, 1, 100);
     }
 
-
     @Override public void getHitSound() {
-        output.playSound(SoundFiles.CLOUDHIT.getFileName());
+        output.playSoundAsync(SoundFiles.CLOUDHIT.getFileName());
     }
-    @Override public void getCritSound() {
-        output.playSound(SoundFiles.CLOUDCRIT.getFileName());
-        System.out.println("*kritischer Treffer!*");
+    @Override public String getCritSound() {
+        output.playSoundAsync(SoundFiles.CLOUDCRIT.getFileName());
+        return "*kritischer Treffer!*";
     }
     @Override public void getMissSound() {
-        output.playSound(SoundFiles.ATTACKMISS.getFileName());
+        output.playSoundAsync(SoundFiles.ATTACKMISS.getFileName());
     }
 
     public void setAge(int age) {
@@ -66,9 +65,8 @@ public class Player extends Char {
         return block;
     }
     @Override public void setBlock(boolean block) {
-        this.block = true;
+        this.block = block;
     }
-
 
     @Override public void setEscape(boolean escape) {
         this.escape = escape;
@@ -82,13 +80,14 @@ public class Player extends Char {
 
         if (escapeChance == true) {
             System.out.println("Du bist geflüchtet");
-            output.playSound(SoundFiles.ESCAPE.getFileName());
+            output.playSoundAsync(SoundFiles.ESCAPE.getFileName());
             escape = true;
             Combatsys.running = false;
+            Game.music.stop();
         } else {
             System.out.println("Du konntest nicht flüchten");
             Utils.sleep(200);
-            output.playSound("sounds/inputFail.wav");
+            output.playSoundAsync("sounds/inputFail.wav");
             escape = false;
         }
     }

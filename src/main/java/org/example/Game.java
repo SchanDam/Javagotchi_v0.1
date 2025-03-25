@@ -1,8 +1,10 @@
 package org.example;
 
 import org.example.audio.SoundFiles;
-import org.example.audio.Sounds;
+import org.example.audio.SoundEffects;
+import org.example.audio.MusicManager;
 import org.example.characters.*;
+import org.w3c.dom.ls.LSParser;
 
 import java.util.Random;
 import java.util.Scanner;
@@ -11,8 +13,10 @@ public class Game {
     public static boolean running;
     static Scanner sc = new Scanner(System.in);
     static Random rng = new Random();
-    static Sounds output = new Sounds();
+    static SoundEffects output = new SoundEffects();
+    public static MusicManager music = new MusicManager();
     static String input;
+    static int hungerDecrease;
 
     static Player player = new Player();
     static Enemies enemy;
@@ -20,6 +24,7 @@ public class Game {
     // Einleitung
     public static void introduce() throws InterruptedException {
 
+        music.play(SoundFiles.INTRO.getFileName());
         System.out.printf("%nDas Ziel des Spiels ist es, den Drachen zu besiegen.%n");
         Utils.sleep(1000);
         System.out.println("Wie ist mein Name?");
@@ -44,7 +49,8 @@ public class Game {
                 player.setDef(255);
                 player.setHp(9999);
                 player.setHunger(255);
-                //mainMenu();
+                music.stop();
+                mainMenu();
             }
 
             // Twigolu
@@ -69,11 +75,11 @@ public class Game {
 
             // Cloud
             case "Cloud" -> {
-                System.out.println("Eine gute Wahl! Das Bustersword wird jeden Gegner zerschmettern!");
-                Utils.sleep(1000);
+                System.out.printf("%nEine gute Wahl! Das Bustersword wird jeden Gegner zerschmettern!");
+                Utils.sleep(2000);
                 ASCII.cloud();
                 Utils.sleep(1500);
-                System.out.println("Cloud hat gesteigerte Attribute:");
+                System.out.println("Cloud hat gesteigerte Attribute");
                 player.setStr(20);
                 player.setDef(16);
                 player.setHp(314);
@@ -91,6 +97,8 @@ public class Game {
 
     // Hauptmenü
     public static void mainMenu() throws InterruptedException {
+        music.stop();
+        music.play(SoundFiles.MENU.getFileName());
         System.out.printf("\n Was möchtest du tun?%n%n");
         Utils.sleep(1000);
         System.out.println("\"a\" für Attribute prüfen");
@@ -153,7 +161,7 @@ public class Game {
         int strIncrease = rng.nextInt(1, 5);         // 1 bis 4
         int defIncrease = rng.nextInt(1, 4);         // 1 bis 3
         int hpIncrease = rng.nextInt(15, 26);        // 15 bis 25
-        int hungerDecrease = rng.nextInt(-4, 0);     // -1 bis -4
+        hungerDecrease = rng.nextInt(-4, 0);     // -1 bis -4
 
         player.setStr(player.getStr() + strIncrease);
         player.setDef(player.getDef() + defIncrease);
@@ -175,43 +183,89 @@ public class Game {
 
     // fight
     public static void fight() throws InterruptedException {
-        System.out.printf("%nGegen welchen Gegner soll %s kämpfen?%n", player.getName());
-        //Utils.sleep(800);
+        System.out.printf("%nGegen welchen Gegner soll %s kämpfen?%n%n", player.getName());
+        Utils.sleep(800);
         System.out.println("\"1\" für Skelett");
-        //Utils.sleep(300);
+        Utils.sleep(300);
         System.out.println("\"2\" für Oger");
-        //Utils.sleep(300);
+        Utils.sleep(300);
         System.out.println("\"3\" für Drache");
-        //Utils.sleep(300);
+        Utils.sleep(300);
         System.out.printf("\"q\" zurück in Hauptmenü%n");
         input = Utils.getSoundInput();
 
         switch (input) {
             case "1" -> {
-                running = true;
-                player.setEscape(false);
                 enemy = new Skelett();
-                enemy.setHp(enemy.getMaxHp());
-
-                System.out.printf("%n%s ausgewählt, starte Kampf", enemy.getName());
-                Utils.dotText();
-                System.out.printf("%nKampf beginnt gegen %s\n", enemy.getName());
-                output.playSound(SoundFiles.STARTFIGHT.getFileName());
-                Utils.sleep(500);
-                Combatsys comsys = new Combatsys(player, enemy);
-                comsys.fight();
-
+                Combatsys comSys = getComSys();
+                music.play(SoundFiles.FIGHTNORMAL.getFileName());
+                Utils.sleep(2000);
+                comSys.fight();
             }
-            case "2" -> enemy = new Oger();
-            case "3" -> enemy = new Drache();
-            case "Sephiroth" -> enemy = new Sephiroth();
+            case "2" -> {
+                enemy = new Oger();
+                Combatsys comSys = getComSys();
+                music.play(SoundFiles.FIGHTBOSS.getFileName());
+                Utils.sleep(2000);
+                comSys.fight();
+            }
+            case "3" -> {
+                enemy = new Drache();
+                Combatsys comSys = getComSys();
+                music.play(SoundFiles.FIGHTSUPERBOSS.getFileName());
+                Utils.sleep(2000);
+                comSys.fight();
+            }
+            case "Sephiroth" -> {
+                enemy = new Sephiroth();
+                Combatsys comSys = getComSys();
+                music.play(SoundFiles.FIGHTSEPH.getFileName());
+                Utils.sleep(2000);
+                comSys.fight();
+            }
             default -> {
                 Utils.sleep(500);
                 System.out.printf("%nungültige Taste%n");
-                output.playSound(SoundFiles.INPUTFAIL.getFileName());
+                output.playSoundAsync(SoundFiles.INPUTFAIL.getFileName());
                 Utils.sleep(300);
             }
         }
+    }
+    private static Combatsys getComSys() throws InterruptedException {
+        running = true;
+        player.setEscape(false);
+        System.out.printf("%n%s ausgewählt, starte Kampf", enemy.getName());
+        Utils.dotText();
+        System.out.printf("%nKampf beginnt gegen %s%n", enemy.getName());
+        music.stop();
+        output.playSoundAsync(SoundFiles.STARTFIGHT.getFileName());
+        Combatsys comSys = new Combatsys(player, enemy, player);
+        return comSys;
+    }
+    public static void playerDefeat() {
+        music.stop();
+        output.playSoundAsync(SoundFiles.LOSE.getFileName());
+        hungerDecrease = rng.nextInt(-5, -1);
+        player.setHunger(player.getHunger() + hungerDecrease);
+        System.out.printf("%n%s wurde besiegt!%n", player.getName());
+        Utils.sleep(7000);
+        System.out.printf("%nDein Sättigungslevel ist um %d gesunken.%n", hungerDecrease);
+        Utils.sleep(2000);
+        music.stop();
+    }
+    public static void enemyDefeat() throws InterruptedException {
+        music.stop();
+        System.out.printf("%n%s wurde besiegt!%n%n", enemy.getName());
+        output.playSoundAsync(SoundFiles.ENEMYDEADSHORT.getFileName());
+        Utils.sleep(800);
+        music.play(SoundFiles.FANFARE.getFileName());
+        Utils.sleep(7000);
+        output.playSoundAsync(SoundFiles.GETCOIN.getFileName());
+        System.out.println("Du hast 10 Gold und 100 Punkte erhalten!"); // TODO muss sich je nach Gegner ändern
+        Utils.sleep(2000);
+        Game.player.setGold(Game.player.getGold() + 10);                // TODO muss sich je nach Gegner ändern
+        Game.player.setPunkte(Game.player.getPunkte() + 100);           // TODO muss sich je nach Gegner ändern
+        music.stop();
     }
 
     // heilen
@@ -233,7 +287,7 @@ public class Game {
                     player.setGold(player.getGold() - 5);
                     Utils.sleep(200);
                     System.out.printf("%nDu hast dich vollständig geheilt!%n");
-                    output.playSound(SoundFiles.HEAL.getFileName());
+                    output.playSoundAsync(SoundFiles.HEAL.getFileName());
                     Utils.sleep(500);
                     return;
                 } else {
@@ -250,7 +304,7 @@ public class Game {
             } else {
                 Utils.sleep(500);
                 System.out.printf("%nungültige Taste%n");
-                output.playSound(SoundFiles.INPUTFAIL.getFileName());
+                output.playSoundAsync(SoundFiles.INPUTFAIL.getFileName());
                 Utils.sleep(300);
             }
         }
@@ -370,5 +424,4 @@ public class Game {
             }
         }
     }
-
 }

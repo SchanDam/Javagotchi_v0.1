@@ -1,17 +1,17 @@
 package org.example;
 import org.example.audio.SoundFiles;
-import org.example.audio.Sounds;
+import org.example.audio.SoundEffects;
 
 public class Main {
 
     static String input;
-    static Sounds output = new Sounds();
+    static SoundEffects output = new SoundEffects();
 
     public static void main(String[] args) throws Exception {
-        Utils.skipDelays = true;
+        Utils.skipDelays = false; //true ignoriert alle sleeps, false führt sie aus
         boolean running = true;
 
-        Game.introduce();
+        //Game.introduce();
 
         while (running) {
             System.out.printf("%n? für Menüanzeige%n");
@@ -81,7 +81,7 @@ public class Main {
             else {
                 Utils.sleep(500);
                 System.out.printf("%nungültige Taste%n");
-                output.playSound(SoundFiles.INPUTFAIL.getFileName());
+                output.playSoundAsync(SoundFiles.INPUTFAIL.getFileName());
                 Utils.sleep(300);
             }
 
