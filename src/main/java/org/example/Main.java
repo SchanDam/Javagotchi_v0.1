@@ -1,4 +1,5 @@
 package org.example;
+
 import org.example.audio.SoundFiles;
 import org.example.audio.SoundEffects;
 
@@ -8,10 +9,12 @@ public class Main {
     static SoundEffects output = new SoundEffects();
 
     public static void main(String[] args) throws Exception {
+        Game game = new Game();
+
         Utils.skipDelays = true; //true ignoriert alle sleeps, false führt sie aus
         boolean running = true;
 
-        Game.introduce();
+        game.introduce();
 
         while (running) {
             System.out.printf("%n? für Menüanzeige%n");
@@ -22,59 +25,55 @@ public class Main {
 
             // Attribute abfragen
             if (input.equals("a")) {
-                Game.printAttributes();
+                game.printAttributes();
             }
 
             // Essen
             else if (input.equals("e")) {
-                Game.eat();
+                game.eat();
             }
 
             // trainieren
             else if (input.equals("t")) {
-                Game.training();
+                game.training();
             }
 
             // kämpfen
             else if (input.equals("k")) {
-                Game.fight();
+                game.fight();
             }
 
             // heilen
             else if (input.equals("h")) {
-                Game.heal();
+                game.heal();
             }
 
             // Punktestand abfragen
             else if (input.equals("p")) {
-                System.out.printf("%nDein aktueller Punktestand ist %s.%n", Game.player.getPunkte());
+                game.showPunkte();
             }
 
             // Neustart
             else if (input.equals("n")) {
-                Game.reset();
+                game.reset();
                 continue;
             }
 
             // Programm beenden
             else if (input.equals("q")) {
-                System.out.printf("%nTschüss, bis bald!%n");
-                Utils.sleep(200);
-                System.out.printf("Du hast %s Punkte erreicht!%n", Game.player.getPunkte());
-                Utils.sleep(500);
-                break;
+                game.quit();
             }
 
             // Debugmenü
             else if (input.equals("debug")) {
                 System.out.printf("%nLade Debugmenü, bitte warten");
                 Utils.dotText();
-                Game.debugMenu();
+                game.debugMenu();
             }
 
             // Auflisten
             else if (input.equals("?")) {
-                Game.mainMenu();
+                game.mainMenu();
             }
 
             // falsche Taste
@@ -83,30 +82,6 @@ public class Main {
                 System.out.printf("%nungültige Taste%n");
                 output.playSoundAsync(SoundFiles.INPUTFAIL.getFileName());
                 Utils.sleep(300);
-            }
-
-            // Hunger tracken
-            if (Game.player.getHunger() < 1) {
-                Utils.sleep(1000);
-                System.out.print("Ich bin verhungert");
-                Utils.dotText();
-                System.out.printf("%nDas Spiel ist vorbei.%n");
-                Utils.sleep(500);
-                ASCII.ritterTot();
-                Utils.sleep(1000);
-                System.out.printf("Du hast %s Punkte erreicht!", Game.player.getPunkte());
-                running = false;
-            }
-
-            // Alter tracken
-            if (Game.player.getAge() > 9) {
-                Utils.sleep(1000);
-                System.out.printf("%nIch bin nun 10 Jahre alt, von nun an bin ich stark genug, um mich selbst durchzuschlagen.%nVielen Dank für deine Hilfe!%n%n");
-                Utils.sleep(1000);
-                System.out.println("Du hast das Spiel gewonnen!");
-                Utils.sleep(200);
-                System.out.printf("Du hast %s Punkte erreicht!", Game.player.getPunkte());
-                running = false;
             }
         }
     }

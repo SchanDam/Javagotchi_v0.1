@@ -177,4 +177,25 @@ public class ASCII {
                 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠉⠉⠁⣿⣼⡿⠟⣨⡏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
                 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⠿⠿⠿⠿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀""");
     }
+
+    // Hp Balken
+
+//    System.out.println("HP: [██████████]");     //100%
+//    System.out.println("HP: [█████████░]");     //90%
+//    System.out.println("HP: [████████░░]");     //80%
+//    System.out.println("HP: [███████░░░]");     //70%
+//    System.out.println("HP: [██████░░░░]");     //60%
+//    System.out.println("HP: [█████░░░░░]");     //50%
+//    System.out.println("HP: [████░░░░░░]");     //40%
+//    System.out.println("HP: [███░░░░░░░]");     //30%
+//    System.out.println("HP: [██░░░░░░░░]");     //20%
+//    System.out.println("HP: [█░░░░░░░░░]");     //10%
+//    System.out.println("HP: [░░░░░░░░░░]");     //logisch, oder?
+
+
+//    public void hpBar() {
+//        if (Combatsys.attacker.getHp() > 99%) {
+//
+//        }
+//    }
 }

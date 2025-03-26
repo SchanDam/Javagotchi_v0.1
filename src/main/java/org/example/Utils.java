@@ -22,17 +22,6 @@ public class Utils {
         }
     }
 
-    // Attribute resetten
-    public static void reset() {
-        Game.player.setStr(1);
-        Game.player.setDef(1);
-        Game.player.setHp(100);
-        Game.player.setGold(0);
-        Game.player.setAge(1);
-        Game.player.setPunkte(0);
-        Game.player.setHunger(5);
-    }
-
     // Methode für formatierte Texte
     public static void souf(String text, Object... args) {
         sout(String.format(text, args));
@@ -79,5 +68,20 @@ public class Utils {
                 Thread.currentThread().interrupt();
             }
         }
+    }
+
+    // Hp Balken CHATGPT
+    public static void printHpBar(int hp, int maxHp) {
+        int barLength = 10;
+        int filledLength = (int) ((hp / (double) maxHp) * barLength);
+
+        StringBuilder bar = new StringBuilder("[");
+        for (int i = 0; i < barLength; i++) {
+            bar.append(i < filledLength ? '█' : '░');
+        }
+        bar.append("] ");
+        bar.append(hp).append("/").append(maxHp);
+
+        System.out.println(bar);
     }
 }

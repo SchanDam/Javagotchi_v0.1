@@ -1,5 +1,6 @@
 package org.example.characters;
 
+import org.example.Game;
 import org.example.audio.SoundFiles;
 import org.example.audio.SoundEffects;
 
@@ -11,9 +12,8 @@ public abstract class Char {
     protected int maxHp;
     protected String name;
     protected boolean miss;
-    protected boolean alive = true;
 
-    protected SoundEffects output = new SoundEffects();
+    protected static SoundEffects output = new SoundEffects();
 
     public Char(String name, int getStr, int getDef, int getHp) {
         this.str = getStr;
@@ -24,7 +24,7 @@ public abstract class Char {
     }
 
     public void setStr(int str) {
-        this.str = Math.min(255, str);
+        this.str = Math.min(9999, str);
     }
     public int getStr() {
         return str;
@@ -44,15 +44,18 @@ public abstract class Char {
         return Math.max(0, hp);
     }
 
+    public void setMaxHp(int maxHp) {
+        this.maxHp = Math.min(9999, maxHp);
+    }
+    public int getMaxHp() {
+        return maxHp;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
     public String getName() {
         return name;
-    }
-
-    public int getMaxHp() {
-        return maxHp;
     }
 
     public boolean isMiss() {
@@ -85,10 +88,11 @@ public abstract class Char {
         output.playSoundAsync(SoundFiles.NORMALCRIT.getFileName());
         return "*kritischer Treffer!*";
     }
+
     public void getMissSound() {
         output.playSoundAsync(SoundFiles.ATTACKMISS.getFileName());
     }
 
-    public void escapeFight() throws InterruptedException {
+    public void escapeFight(Game game) {
     }
 }

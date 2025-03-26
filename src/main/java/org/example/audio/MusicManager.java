@@ -4,7 +4,7 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
-import java.io.InputStream;
+import java.io.BufferedInputStream;
 
 public class MusicManager {
     private Clip musicClip;
@@ -14,10 +14,10 @@ public class MusicManager {
         stop();
         new Thread(() -> {
             try {
-                InputStream audioSrc = getClass().getResourceAsStream("/" + fileName);
-                if (audioSrc == null) return;
+                BufferedInputStream bufferedIn = new BufferedInputStream(getClass().getResourceAsStream("/" + fileName));
+                if (bufferedIn == null) return;
 
-                AudioInputStream stream = AudioSystem.getAudioInputStream(audioSrc);
+                AudioInputStream stream = AudioSystem.getAudioInputStream(bufferedIn);
                 musicClip = AudioSystem.getClip();
                 musicClip.open(stream);
                 FloatControl volumeControl = (FloatControl) musicClip.getControl(FloatControl.Type.MASTER_GAIN);
@@ -28,6 +28,7 @@ public class MusicManager {
             }
         }).start();
     }
+
 
     public void stop() {
         if (musicClip != null && musicClip.isRunning()) {

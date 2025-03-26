@@ -15,14 +15,16 @@ public class Combatsys {
     boolean isCritical;
     public static boolean running = true;
 
+    private final Game game;
     private Char attacker;
     private Char defender;
     private final Char truePlayer;
 
-    public Combatsys(Char attacker, Char defender, Char truePlayer) {
+    public Combatsys(Char attacker, Char defender, Char truePlayer, Game game) {
         this.attacker = attacker;
         this.defender = defender;
         this.truePlayer = truePlayer;
+        this.game = game;
     }
 
     // Kampflogik
@@ -45,7 +47,7 @@ public class Combatsys {
     // Schadensberechnung
     private int calcDamage() throws InterruptedException {
         if (attacker.isEscape() == true) {
-            attacker.escapeFight();
+            attacker.escapeFight(game);
             return 0;
         }
         int baseDamage = Math.max(0, attacker.getStr() - defender.getDef());
@@ -89,7 +91,8 @@ public class Combatsys {
                 attacker.getHitSound();
             }
             Utils.sleep(500);
-            System.out.printf("%nVerbleibende Lebenspunkte von %s: %s%n", defender.getName(), defender.getHp());
+            System.out.printf("%nVerbleibende Lebenspunkte von %s: ", defender.getName());
+            Utils.printHpBar(defender.getHp(), defender.getMaxHp());
             Utils.sleep(1000);
         }
     }
@@ -116,16 +119,18 @@ public class Combatsys {
                 attacker.getHitSound();
             }
             Utils.sleep(500);
-            System.out.printf("%nVerbleibende Lebenspunkte von %s: %s%n", defender.getName(), defender.getHp());
+            System.out.printf("%nVerbleibende Lebenspunkte von %s: ", defender.getName());
+            Utils.printHpBar(defender.getHp(), defender.getMaxHp());
             Utils.sleep(1000);
         }
     }
 
     // Auswahl nächste Runde
-    private void nextRoundOption() throws InterruptedException {
-
+    private void nextRoundOption() {
         if (attacker != truePlayer) return;
-        if (attacker.getHp() > 1) {
+        if (attacker.getHp() < 1) return;
+
+        while (true) {
             System.out.printf("%n**Nächste Runde**%n%n");
             Utils.sleep(100);
             output.playSoundAsync(SoundFiles.NEXTROUND.getFileName());
@@ -138,9 +143,22 @@ public class Combatsys {
 
             switch (input) {
                 case "1" -> {
+                    return;
+                }         // angreifen
+                case "2" -> {
+                    truePlayer.setBlock(true);  // blocken
+                    return;
                 }
-                case "2" -> truePlayer.setBlock(true);
-                case "3" -> attacker.escapeFight();
+                case "3" -> {
+                    attacker.escapeFight(game); // flüchten
+                    return;
+                }
+                default -> {
+                    Utils.sleep(500);
+                    System.out.printf("%nungültige Taste%n");
+                    output.playSoundAsync(SoundFiles.INPUTFAIL.getFileName());
+                    Utils.sleep(300);
+                }
             }
         }
     }
@@ -148,10 +166,10 @@ public class Combatsys {
     // defeatcheck
     private void checkDefeat() throws InterruptedException {
         if (defender == truePlayer && defender.isAlive() == false) {
-            Game.playerDefeat();
+            game.playerDefeat();
             running = false;
         } else if (defender != truePlayer && defender.isAlive() == false) {
-            Game.enemyDefeat();
+            game.enemyDefeat();
             running = false;
         }
     }

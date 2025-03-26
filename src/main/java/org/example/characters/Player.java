@@ -1,16 +1,16 @@
 package org.example.characters;
 import org.example.Combatsys;
+import org.example.Game;
 import org.example.Utils;
 import org.example.audio.SoundFiles;
 import org.example.audio.SoundEffects;
 import java.util.Random;
-import org.example.Game;
 
 public class Player extends Char {
 
     private int age = 1;
     private int hunger = 5;
-    private int gold;
+    private int gold = 5;
     private int punkte = 0;
     private boolean block = false;
     private boolean escape = false;
@@ -75,7 +75,7 @@ public class Player extends Char {
         return escape;
     }
 
-    @Override public void escapeFight() {
+    public void escapeFight(Game game) {
         boolean escapeChance = (rng.nextInt(100) < 80);
 
         if (escapeChance == true) {
@@ -83,7 +83,7 @@ public class Player extends Char {
             output.playSoundAsync(SoundFiles.ESCAPE.getFileName());
             escape = true;
             Combatsys.running = false;
-            Game.music.stop();
+            game.getMusic().stop();
         } else {
             System.out.println("Du konntest nicht flüchten");
             Utils.sleep(200);
