@@ -2,6 +2,8 @@ package org.example;
 
 import org.example.audio.SoundFiles;
 import org.example.audio.SoundEffects;
+import org.example.utils.SpeedController;
+import org.example.utils.Utils;
 
 public class Main {
 
@@ -9,6 +11,7 @@ public class Main {
     static SoundEffects output = new SoundEffects();
 
     public static void main(String[] args) throws Exception {
+        new SpeedController().start(); // Chatgpt - siehe Klasse SpeedController
         Game game = new Game();
 
         Utils.skipDelays = true; //true ignoriert alle sleeps, false führt sie aus

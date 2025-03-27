@@ -1,7 +1,7 @@
 package org.example.characters;
 import org.example.Combatsys;
 import org.example.Game;
-import org.example.Utils;
+import org.example.utils.Utils;
 import org.example.audio.SoundFiles;
 import org.example.audio.SoundEffects;
 import java.util.Random;

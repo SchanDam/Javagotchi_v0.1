@@ -1,7 +1,7 @@
 package org.example.characters;
 
 import org.example.Game;
-import org.example.Utils;
+import org.example.utils.Utils;
 import org.example.audio.SoundFiles;
 
 public class Enemies extends Char {

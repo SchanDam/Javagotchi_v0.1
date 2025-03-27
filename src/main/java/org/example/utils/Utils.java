@@ -1,4 +1,4 @@
-package org.example;
+package org.example.utils;
 import org.example.audio.SoundEffects;
 import java.util.Random;
 import java.util.Scanner;
@@ -8,19 +8,26 @@ public class Utils {
     private static final Scanner sc = new Scanner(System.in);
     private static final SoundEffects output = new SoundEffects();
 
+    // methode kommt von CHATGPT
     public static void sout(String text) {
         try {
             for (char c : text.toCharArray()) {
                 System.out.print(c);
+                System.out.flush();
 
-                // Zufällige Geschwindigkeit zwischen 30 und 120 ms für Retro-Effekt
-                Thread.sleep(rng.nextInt(40, 120));
+                if (!skipDelays) {
+                    int delay = SpeedController.isSpeedMode() ? 10 : rng.nextInt(40, 120);
+                    Thread.sleep(delay);
+                }
             }
             System.out.println();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+
+        SpeedController.resetSpeedMode(); // Nur einmal pro Textblock zurücksetzen
     }
+
 
     // Methode für formatierte Texte
     public static void souf(String text, Object... args) {

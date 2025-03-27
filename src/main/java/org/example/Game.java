@@ -4,6 +4,7 @@ import org.example.audio.SoundFiles;
 import org.example.audio.SoundEffects;
 import org.example.audio.MusicManager;
 import org.example.characters.*;
+import org.example.utils.Utils;
 
 import java.util.Random;
 import java.util.Scanner;
@@ -26,10 +27,9 @@ public class Game {
     // Einleitung
     public void introduce() throws InterruptedException {
 
+        System.out.println("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.");
+
         music.play(SoundFiles.INTRO.getFileName());
-        System.out.printf("%n%s“Ich werde nie eine Erinnerung sein", ITALIC);
-        Utils.dotText();
-        System.out.printf("”%s", STOP);
         System.out.printf("%nDas Ziel des Spiels ist es, den Drachen zu besiegen.%n");
         Utils.sleep(1000);
         System.out.println("Wie ist mein Name?");
